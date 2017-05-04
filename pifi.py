@@ -54,26 +54,26 @@ iface default inet dhcp
     self.aps = aps_by_signal_strength
 
   def printAPs(self):
-    print "Available networks:"
+    print "Bulunan ağlar:"
     index = 0
     for ap in self.aps:
-      print "[%d] SSID:%s  Strength:%d  Protected:%s" % (index, ap.ssid, ap.signal, str(ap.encrypted))
+      print "[%d] SSID:%s  Güç:%d  Şifreli:%s" % (index, ap.ssid, ap.signal, str(ap.encrypted))
       index = index + 1
   
   def promptForSSID(self):
     ap_count = len(self.aps)
     while (True):
-      prompt = "Select wifi AP (0-%d): " % (ap_count - 1)
+      prompt = "Hangi ağa bağlanalım (0-%d)? " % (ap_count - 1)
       ap_index = raw_input(prompt)
       if ap_index.isdigit():
         ap_index_int = int(ap_index)
         if (ap_index_int >= ap_count or ap_index_int < 0):
           pass
         else:  
-          print "Selected wifi AP: " + self.aps[ap_index_int].ssid
+          print "Seçilen ağ adı: " + self.aps[ap_index_int].ssid
           break
 
-      print "'%s' is not a valid selection. %s" % (ap_index, prompt) 
+      print "'%s' geçerli bir numara değil. %s" % (ap_index, prompt) 
       continue
     self.setAPFromIndex(ap_index_int)
 
@@ -84,13 +84,13 @@ iface default inet dhcp
 
   def promptForPassword(self):
     if (self.selected_ap_encrypted):
-      password = raw_input("Enter password for '%s': " % self.selected_ap_ssid)
+      password = raw_input("'%s' ağı için parola: " % self.selected_ap_ssid)
       self.selected_ap_password = password
     else:
-      print "'%s' is not encrypted. No password necessary." % self.selected_ap_ssid
+      print "'%s' ağı şifresiz. Parolasız giriş yapılıyor..." % self.selected_ap_ssid
 
   def generateWPASupplicant(self):
-    print "Generating '%s'..." % self.wpa_supplicant_path
+    print "Şifre profili oluşturuluyor '%s'..." % self.wpa_supplicant_path
     if (self.selected_ap_encrypted):
       encryption_string = 'psk="%s"' % self.selected_ap_password
     else:
@@ -102,7 +102,7 @@ iface default inet dhcp
     file.close()
 
   def generateEtcInterfaces(self):
-    print "Generating '%s'..." % self.etc_interfaces_path
+    print "Ağ profili oluşturuluyor '%s'..." % self.etc_interfaces_path
     file = open(self.etc_interfaces_path, 'w')
     file.write(self.etc_interfaces_template)
     file.close()
@@ -124,7 +124,7 @@ iface default inet dhcp
       return False
 
   def reconnect(self):
-    print 'Re-connecting wifi...'
+    print 'Ağa bağlanılıyor...'
     proc = subprocess.Popen(['sudo', 'ifdown', self.interface], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     proc.wait()
     proc2 = subprocess.Popen(['sudo', 'ifup', self.interface], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -146,18 +146,18 @@ iface default inet dhcp
         break
       else:
         print
-        print "[ERROR] Failed to connect to '%s'!" % self.selected_ap_ssid
-        print "[ERROR] Please try again, and double-check your password."
+        print "[HATA] Şu ağa bağlanamadık '%s'!" % self.selected_ap_ssid
+        print "[HATA] Lütfen parolayı doğru girdiğinizden emin olup tekrar deneyin."
         print
 
-    print "SUCCESS! IP: %s" % self.ip
+    print "Bağlantı başarılı! IP: %s" % self.ip
 
 
 class PiFiGUI(PiFi):
   def __init__(self):
     PiFi.__init__(self)
 
-    print "Initializing PiTFT screen..."
+    print "PiTFT ekran başlatılıyor..."
     os.putenv('SDL_VIDEODRIVER', 'fbcon')
     os.putenv('SDL_FBDEV'      , '/dev/fb1')
     os.putenv('SDL_MOUSEDRV'   , 'TSLIB')
@@ -204,13 +204,13 @@ class PiFiGUI(PiFi):
     self.screen.blit(txt, (15, 5))
 
   def showSplashScreen(self):
-    self.renderCenteredText('PiFi: WiFi Setup Wizard');
+    self.renderCenteredText('Ağ yardımcısı açılıyor');
 
   def showAPs(self):
-    self.renderCenteredText('Scanning for WiFi networks...');
+    self.renderCenteredText('Kablosuz ağlar taranıyor...');
     self.getWifiAPs()
     self.clearScreen()
-    self.addHeader('Tap to select a WiFi network...')
+    self.addHeader('Ağ seçmek için dokunun...')
     y = self.rowHeight
     for each in self.aps:
       line = "[ %s ] (%d)" % (each.ssid, each.signal) 
@@ -245,9 +245,9 @@ class PiFiGUI(PiFi):
 
   def confirmSelectedAP(self):
     self.clearScreen()
-    self.addHeader("Connect to: '%s'?" % self.selected_ap_ssid)
-    yes = self.txtFont.render("Yes", 1, self.white)
-    no = self.txtFont.render("No", 1, self.white)
+    self.addHeader("Bu ağa bağlanılsın mı: '%s'?" % self.selected_ap_ssid)
+    yes = self.txtFont.render("Evet", 1, self.white)
+    no = self.txtFont.render("Hayır", 1, self.white)
     self.screen.blit(yes, (50, self.height / 2 ))
     self.screen.blit(no, (self.width - 120, self.height / 2))
     self.display.update()
@@ -262,7 +262,7 @@ class PiFiGUI(PiFi):
       return False
 
   def promptForPassword(self):
-    self.renderCenteredText("Enter the WiFi password...")
+    self.renderCenteredText("Ağ için parola girin...")
     time.sleep(2)
     if (self.selected_ap_encrypted):
       vkey = VirtualKeyboard(self.screen)
@@ -281,17 +281,17 @@ class PiFiGUI(PiFi):
         ap_confirmed = self.getConfirmation()
     
       self.promptForPassword()
-      self.renderCenteredText("Connecting to '%s'..." % self.selected_ap_ssid)
+      self.renderCenteredText("'%s' ağına bağlanılıyor..." % self.selected_ap_ssid)
       self.generateEtcInterfaces()
       self.generateWPASupplicant()
       self.reconnect()
       if(self.isConnected()):
         break
       else:
-        self.renderCenteredText("Failed! Check WiFi password")
+        self.renderCenteredText("Bağlantı başarısız! Parolayı doğru girdiğinize emin olun")
         time.sleep(3)
     
-    self.renderCenteredText("Success! IP: %s" % self.ip)
+    self.renderCenteredText("Bağlandı! IP: %s" % self.ip)
     time.sleep(2)
     self.quit()    
 
