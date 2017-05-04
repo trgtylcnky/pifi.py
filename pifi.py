@@ -10,6 +10,9 @@ import signal
 from wifi import Cell, Scheme
 from virtualKeyboard import VirtualKeyboard
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 class PiFi:
 
   def __init__(self, interface='wlan0'):
