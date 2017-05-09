@@ -209,13 +209,13 @@ class PiFiGUI(PiFi):
     self.screen.blit(txt, (15, 5))
 
   def showSplashScreen(self):
-    self.renderCenteredText('Ağ yardımcısı açılıyor');
+    self.renderCenteredText(u'Ağ yardımcısı açılıyor');
 
   def showAPs(self):
-    self.renderCenteredText('Kablosuz ağlar taranıyor...');
+    self.renderCenteredText(u'Kablosuz ağlar taranıyor...');
     self.getWifiAPs()
     self.clearScreen()
-    self.addHeader('Ağ seçmek için dokunun...')
+    self.addHeader(u'Ağ seçmek için dokunun...')
     y = self.rowHeight
     for each in self.aps:
       line = "[ %s ] (%d)" % (each.ssid, each.signal) 
@@ -250,9 +250,9 @@ class PiFiGUI(PiFi):
 
   def confirmSelectedAP(self):
     self.clearScreen()
-    self.addHeader("Bu ağa bağlanılsın mı: '%s'?" % self.selected_ap_ssid)
-    yes = self.txtFont.render("Evet", 1, self.white)
-    no = self.txtFont.render("Hayır", 1, self.white)
+    self.addHeader(u"Bu ağa bağlanılsın mı: '%s'?" % self.selected_ap_ssid)
+    yes = self.txtFont.render(u"Evet", 1, self.white)
+    no = self.txtFont.render(u"Hayır", 1, self.white)
     self.screen.blit(yes, (50, self.height / 2 ))
     self.screen.blit(no, (self.width - 120, self.height / 2))
     self.display.update()
@@ -267,7 +267,7 @@ class PiFiGUI(PiFi):
       return False
 
   def promptForPassword(self):
-    self.renderCenteredText("Ağ için parola girin...")
+    self.renderCenteredText(u"Ağ için parola girin...")
     time.sleep(2)
     if (self.selected_ap_encrypted):
       vkey = VirtualKeyboard(self.screen)
@@ -286,17 +286,17 @@ class PiFiGUI(PiFi):
         ap_confirmed = self.getConfirmation()
     
       self.promptForPassword()
-      self.renderCenteredText("'%s' ağına bağlanılıyor..." % self.selected_ap_ssid)
+      self.renderCenteredText(u"'%s' ağına bağlanılıyor..." % self.selected_ap_ssid)
       self.generateEtcInterfaces()
       self.generateWPASupplicant()
       self.reconnect()
       if(self.isConnected()):
         break
       else:
-        self.renderCenteredText("Bağlantı başarısız! Parolayı doğru girdiğinize emin olun")
+        self.renderCenteredText(u"Bağlantı başarısız! Parolayı doğru girdiğinize emin olun")
         time.sleep(3)
     
-    self.renderCenteredText("Bağlandı! IP: %s" % self.ip)
+    self.renderCenteredText(u"Bağlandı! IP: %s" % self.ip)
     time.sleep(2)
     self.quit()    
 
